@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - directory: /
+    package-ecosystem: maven
+    open-pull-requests-limit: 5
+    schedule:
+      timezone: America/New_York
+      time: "00:00"
+      interval: weekly
+    target-branch: SBX
+    labels:
+      - "dependabot"
+      - "java"
+      - "maven dependencies"
+    reviewers:
+      - "ghoshal_parag_ranjan@network.lilly.com"

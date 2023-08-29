@@ -1,0 +1,80 @@
+name: ITQS CUCUMBER JAVA RUN
+
+on: 
+
+  workflow_dispatch
+  #push:
+  #  branches: [ main, sbx]
+  #pull_request:
+  #  branches: [ main, sbx]
+
+jobs:
+  set-execution-env:
+    runs-on: ubuntu-latest
+    outputs:
+      the_env_name: ${{steps.get-env.outputs.selected_env}}
+    steps:
+      - name: Fetch Execution Environment
+        id: set-actual-execution-env
+        run: |
+          if [ $GITHUB_REF_NAME == "main" || $GITHUB_BASE_REF == "main" ]; then
+            echo "target_env=qa" >> "$GITHUB_ENV";
+          else
+            echo "target_env=sbx" >> "$GITHUB_ENV";
+          fi
+          echo ${{github.ref_name}}
+
+      - name: Set Execution Environment to Output Variables
+        id: get-env
+        run: | 
+          echo "${{env.target_env}}"
+          echo "selected_env=$target_env" >> $GITHUB_OUTPUT
+
+  run-test:
+    needs: [set-execution-env]
+    runs-on: ubuntu-latest
+    outputs:
+      workflow-start: ${{ steps.timestamp.outputs.timestamp }}
+    environment:
+      name: ${{needs.set-execution-env.outputs.the_env_name}}
+    steps:
+      - name: Get Test Start Time
+        id: timestamp
+        run: |
+          TIMESTAMP=$(date +"%Y-%m-%d %H:%M ET")
+          echo "::set-output name=timestamp::$TIMESTAMP"
+
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Checkstyle Code Linting
+        run: mvn -ntp validate
+
+      - name: Run Test
+        run: mvn clean test
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          JIRA_USER_ID: ${{ secrets.JIRA_USER_ID }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_XRAY_USER_ID: ${{ secrets.JIRA_XRAY_USER_ID }}
+          JIRA_XRAY_SECRET: ${{ secrets.JIRA_XRAY_SECRET }}
+          AEM_APPLICATION_PASSWORD: ${{secrets.AEM_APPLICATION_PASSWORD}}
+      
+      - name: Upload Execution Report
+        if: always()
+        run: mvn compile exec:java -D"exec.mainClass"="coreClass.JiraIntegration"
+        #working-directory: ./src/main/java/coreClass
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          JIRA_USER_ID: ${{ secrets.JIRA_USER_ID }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_XRAY_USER_ID: ${{ secrets.JIRA_XRAY_USER_ID }}
+          JIRA_XRAY_SECRET: ${{ secrets.JIRA_XRAY_SECRET }}
+          AEM_APPLICATION_PASSWORD: ${{secrets.AEM_APPLICATION_PASSWORD}}

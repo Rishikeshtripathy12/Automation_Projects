@@ -1,0 +1,44 @@
+name: ITQS CUCUMBER JAVA RUN
+
+on: 
+
+  workflow_dispatch
+  # push:
+  #   branches: [DEMO_BRANCH_FIXES]
+  #pull_request:
+  #  branches: [ main, sbx]
+
+jobs:
+  set-env-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo SAUCE_ACCESS_KEY=${{ secrets.SAUCE_ACCESS_KEY }} >> .env
+          echo SAUCE_USERNAME=${{ secrets.SAUCE_USERNAME }} >> .env
+          echo AEM_APPLICATION_PASSWORD=${{ secrets.AEM_APPLICATION_PASSWORD }} >> .env
+          echo APPLICATION_PASSWORD=${{ secrets.APPLICATION_PASSWORD }} >> .env
+          echo JIRA_TOKEN=${{ secrets.JIRA_TOKEN }} >> .env
+          echo JIRA_USER_ID=${{ secrets.JIRA_USER_ID }} >> .env
+          echo JIRA_XRAY_SECRET=${{ secrets.JIRA_XRAY_SECRET }} >> .env
+          echo JIRA_XRAY_USER_ID=${{ secrets.JIRA_XRAY_USER_ID }} >> .env
+          cat .env
+
+      # - name: 'Create tempenv file'
+      #   run: |
+      #     touch .env
+      #     echo SAUCE_ACCESS_KEY=${{ secrets.SAUCE_ACCESS_KEY }} >> .env
+      #     echo SAUCE_USERNAME=${{ secrets.SAUCE_USERNAME }} >> .env
+      #     echo "${{ secrets.ENV_FILE }}" >> .env
+      #     cat .env    
+          
+      - name: 'upload artifacts'
+        if: always()
+        uses: actions/upload-artifact@v2
+        with: 
+          name: assets-for-download
+          path: .env
+
+
+    
