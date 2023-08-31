@@ -35,27 +35,33 @@ public class EcommerceLoginTest {
         WebElement usernameField = driver.findElement(By.id("input-email"));
         WebElement passwordField = driver.findElement(By.id("input-password"));
         WebElement loginButton = driver.findElement(By.xpath("//input[@value=\"Login\"]"));
-        usernameField.sendKeys("koushik350@gmail.com");
-        passwordField.sendKeys("pass123$");
+        usernameField.sendKeys("rishikesh4999@gmail.com");
+        passwordField.sendKeys("Pass123$");
         loginButton.click();
-                if (driver.getCurrentUrl().contains("dashboard")) {
+                if (driver.getCurrentUrl().contains("account")) {
                     System.out.println("Login successful");
                 } else {
                     System.out.println("Login failed");
                 }
             }
     public static void testInvalidLogin(WebDriver driver) throws InterruptedException {
-        driver.get("https://ecommerce-playground.lambdatest.io/index.php");
+        //driver.get("https://ecommerce-playground.lambdatest.io/index.php");
         Thread.sleep(8000);
         Actions builder = new Actions(driver);
-        WebElement element = driver.findElement(By.xpath("//a[@data-toggle='dropdown']//span[contains(., 'My account')]"));
-        builder.moveToElement(element).click().perform();
+        WebElement element1 = driver.findElement(By.xpath("//a[@data-toggle='dropdown']//span[contains(., 'My account')]"));
+        builder.moveToElement(element1).build().perform();
+        WebElement element2 = driver.findElement(By.xpath("//span[contains(., 'Logout')]"));
+        builder.moveToElement(element2).click().perform();
         Thread.sleep(8000);
+        WebElement element3 = driver.findElement(By.xpath("//a[@data-toggle='dropdown']//span[contains(., 'My account')]"));
+        builder.moveToElement(element3).build().perform();
+        WebElement element4 = driver.findElement(By.xpath("//span[contains(., 'Login')]"));
+        builder.moveToElement(element4).click().perform();
         WebElement usernameField = driver.findElement(By.id("input-email"));
         WebElement passwordField = driver.findElement(By.id("input-password"));
         WebElement loginButton = driver.findElement(By.xpath("//input[@value=\"Login\"]"));
-        usernameField.sendKeys("koushik350@gmail.com");
-        passwordField.sendKeys("pass123$");
+        usernameField.sendKeys("rishikesh4999@gmail.com");
+        passwordField.sendKeys("Pass123$!");
         loginButton.click();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         // Wait until the error message element is visible
@@ -70,7 +76,6 @@ public class EcommerceLoginTest {
     public static void testForgotPassword(WebDriver driver) {
 
         // Add test scenario code for password reset here
-
     }
 
     
